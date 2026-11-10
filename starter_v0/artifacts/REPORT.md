@@ -158,6 +158,17 @@ Từ `transcripts/*.transcript.json` (version `v4_tools`, `openai/gpt-4o-mini`, 
 
 ## B5. Bonus Evidence
 
+Only fill if your team did bonus.
+
+| Bonus | Evidence File | What Worked | Risk / Guardrail |
+|---|---|---|---|
+| send (Telegram) |  |  |  |
+| arXiv/company policy |  |  |  |
+| UI |  |  |  |
+| Tool unit tests (`tests/`) | `pytest` output |  |  |
+
+Tool unit tests: số test đã viết, số bug tìm được trong tool có sẵn (nếu có), và một ví dụ lỗi mà unit test bắt được nhưng eval không bắt được.
+
 ## B6. Reflection
 
 - **Which fixes belonged in `system_prompt.md`?** Gần như tất cả cải thiện đã làm: bỏ chỉ dẫn xấu của starter (đoán thay vì hỏi, gửi không cần xác nhận), rule hỏi lại khi thiếu handle/URL, xác nhận trước khi `send`, phạm vi (không gọi tool cho toán/code), quy ước args (`query` không thêm "news", `today` → `day`, `this week` → `week`), map tên → handle, và toàn bộ logic multi-turn (yêu cầu mới nhất ưu tiên, hủy tool cũ). Cả 5 version đều chỉ sửa `system_prompt.md`.
