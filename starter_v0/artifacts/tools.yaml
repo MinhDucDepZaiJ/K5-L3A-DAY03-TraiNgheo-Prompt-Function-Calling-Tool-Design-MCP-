@@ -123,3 +123,36 @@ tools:
         max_pages: {type: integer, default: 5, description: "Số trang"}
         max_chars: {type: integer, default: 8000, description: "Số ký tự"}
       required: [arxiv_url]
+    
+    
+  - name: compare_sources
+    description: >
+      So sánh nội dung văn bản từ hai nguồn thông tin đã thu thập.
+      Sử dụng khi người dùng yêu cầu so sánh hai bài báo, bài viết,
+      báo cáo hoặc hai nguồn nghiên cứu để tìm ra các phát biểu
+      tương đồng và những thông tin chỉ xuất hiện ở từng nguồn.
+      Không sử dụng khi chỉ có một nguồn thông tin hoặc khi
+      người dùng yêu cầu xác minh tính chính xác của sự thật.
+      Nếu chưa có nội dung nguồn, cần sử dụng công cụ tìm kiếm
+      hoặc đọc URL để thu thập dữ liệu trước khi so sánh.
+      Công cụ chỉ so sánh mức độ tương đồng về câu chữ,
+      không tự xác định thông tin nào đúng hoặc sai.
+    parameters:
+      type: object
+      properties:
+        source_a:
+          type: string
+          description: "Nội dung văn bản của nguồn thông tin thứ nhất."
+        source_b:
+          type: string
+          description: "Nội dung văn bản của nguồn thông tin thứ hai."
+        title_a:
+          type: string
+          default: "Nguồn A"
+          description: "Tiêu đề của nguồn thông tin thứ nhất."
+        title_b:
+          type: string
+          default: "Nguồn B"
+          description: "Tiêu đề của nguồn thông tin thứ hai."
+      required: [source_a, source_b]
+

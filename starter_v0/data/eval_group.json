@@ -1,7 +1,233 @@
+
 {
   "dataset_id": "day04_v2_research_group",
   "dataset_role": "group",
-  "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "description": "10 tình huống đánh giá Research Agent do nhóm xây dựng, gồm 5 single-turn và 5 multi-turn.",
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info"
+  ],
+  "cases": [
+    {
+      "id": "G01_news",
+      "phase": "B",
+      "query": "Tìm tin tức về OpenAI trong tuần này.",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "arguments": {
+              "query": "OpenAI",
+              "topic": "news",
+              "timeframe": "week"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Chọn lookup để tìm tin tức và truyền đúng timeframe."
+      }
+    },
+    {
+      "id": "G02_twitter",
+      "phase": "B",
+      "query": "Tìm 5 bài đăng mới nhất về AI trên Twitter.",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "arguments": {
+              "query": "AI",
+              "search_type": "Latest",
+              "limit": 5
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Tìm bài đăng Twitter với chế độ Latest và giới hạn 5."
+      }
+    },
+    {
+      "id": "G03_papers",
+      "phase": "B",
+      "query": "Tìm 3 bài báo khoa học về large language models trên arXiv.",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "arguments": {
+              "query": "large language models",
+              "max_results": 3
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Sử dụng papers thay vì lookup để tìm bài báo khoa học."
+      }
+    },
+    {
+      "id": "G04_compare",
+      "phase": "B",
+      "query": "So sánh hai nội dung sau. Nguồn A: OpenAI vừa công bố mô hình AI mới. Nguồn B: OpenAI vừa công bố mô hình AI mới.",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "compare_sources",
+            "arguments": {
+              "source_a": "OpenAI vừa công bố mô hình AI mới.",
+              "source_b": "OpenAI vừa công bố mô hình AI mới."
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Chọn Custom Tool compare_sources khi có đủ hai nguồn văn bản."
+      }
+    },
+    {
+      "id": "G05_fetch",
+      "phase": "B",
+      "query": "Đọc nội dung tại https://example.com/article.",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "fetch",
+            "arguments": {
+              "url": "https://example.com/article"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Chọn fetch để đọc URL thay vì tìm kiếm lại."
+      }
+    },
+    {
+      "id": "G06_change_limit",
+      "phase": "B",
+      "turns": [
+        "Lấy 5 bài đăng gần đây của tài khoản elonmusk.",
+        "Đổi thành 3 bài thôi."
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "arguments": {
+              "screenname": "elonmusk",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Giữ tài khoản từ lượt trước và cập nhật limit."
+      }
+    },
+    {
+      "id": "G07_switch_source",
+      "phase": "B",
+      "turns": [
+        "Tìm các bài đăng về OpenAI trên Twitter.",
+        "Bỏ Twitter, chuyển sang tìm tin tức trên web.",
+        "Giữ nguyên chủ đề OpenAI."
+      ],
+      "failure_type": "unnecessary_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "arguments": {
+              "query": "OpenAI",
+              "topic": "news"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Hủy yêu cầu Twitter cũ và chỉ gọi lookup."
+      }
+    },
+    {
+      "id": "G08_change_topic",
+      "phase": "B",
+      "turns": [
+        "Tìm tin tức về OpenAI trong tuần này.",
+        "Đổi chủ đề sang Google Gemini."
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "arguments": {
+              "query": "Google Gemini",
+              "topic": "news",
+              "timeframe": "week"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Thay đổi chủ đề nhưng giữ nguồn tin và thời gian."
+      }
+    },
+    {
+      "id": "G09_compare_update",
+      "phase": "B",
+      "turns": [
+        "So sánh hai nguồn: Nguồn A là 'AI giúp tăng năng suất.' và nguồn B là 'AI giúp tăng năng suất.'",
+        "Đổi nguồn B thành 'AI có thể làm thay đổi thị trường lao động.'"
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "compare_sources",
+            "arguments": {
+              "source_a": "AI giúp tăng năng suất.",
+              "source_b": "AI có thể làm thay đổi thị trường lao động."
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Giữ nguồn A và cập nhật nguồn B qua nhiều lượt."
+      }
+    },
+    {
+      "id": "G10_missing_source",
+      "phase": "B",
+      "turns": [
+        "Tôi muốn so sánh hai bài viết về AI.",
+        "Bài thứ nhất có nội dung: AI đang phát triển rất nhanh."
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "arguments": {
+              "question": "Bạn vui lòng cung cấp nội dung bài viết thứ hai để tôi có thể so sánh."
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Yêu cầu bổ sung nguồn B thay vì gọi compare_sources khi thiếu dữ liệu."
+      }
+    }
+  ]
 }
