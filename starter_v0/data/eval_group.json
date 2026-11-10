@@ -1,6 +1,6 @@
 
 {
-  "dataset_id": "day04_v2_research_group",
+  "dataset_id": "day03_group_research",
   "dataset_role": "group",
   "description": "10 tình huống đánh giá Research Agent do nhóm xây dựng, gồm 5 single-turn và 5 multi-turn.",
   "allowed_failure_types": [
