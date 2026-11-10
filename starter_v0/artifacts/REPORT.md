@@ -3,7 +3,11 @@
 ## Team
 
 - Team: TraiNgheo
-- Members: Nguyễn Đức Minh - 2A2022603633, Bùi Lê Công Tuấn - 2A202603610, Trần Quốc Đông - 2A202603643, Ngô Văn Tuân - 2A202603630 
+- Members:
+* Nguyễn Đức Minh - 2A2022603633,
+* Bùi Lê Công Tuấn - 2A202603610,
+* Trần Quốc Đông - 2A202603643,
+* Ngô Văn Tuân - 2A202603630 
 - Provider/model: OpenRouter — `openai/gpt-4o-mini` (all runs and transcripts)
 
 ---
