@@ -1,7 +1,269 @@
 {
-  "dataset_id": "day04_v2_research_group",
+  "dataset_id": "day03_group_research",
   "dataset_role": "group",
-  "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "description": "Eval do nhóm tự viết: bẫy routing (người vs chủ đề), map tên->handle, timeframe, xác nhận trước khi gửi, câu cảm ơn/ngoài phạm vi, và hội thoại nhiều lượt có sửa ý / đổi tool.",
+  "cases": [
+    {
+      "id": "GS01_name_to_handle_limit",
+      "phase": "B",
+      "suite": "group",
+      "query": "Lấy 3 bài đăng gần đây nhất của Satya Nadella",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "satyanadella",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "routing_user_tweets_name_to_handle",
+        "difficulty": "medium",
+        "what_it_tests": "Bài đăng CỦA một người: map tên Satya Nadella thành handle satyanadella (không có @) và truyền đúng limit=3."
+      }
+    },
+    {
+      "id": "GS02_topic_about_person_not_timeline",
+      "phase": "B",
+      "suite": "group",
+      "query": "Mọi người nói gì về Andrej Karpathy trên X dạo này?",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {}
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "routing_search_vs_timeline",
+        "difficulty": "hard",
+        "what_it_tests": "Bẫy routing: người dùng hỏi người khác NÓI GÌ VỀ một người, nên phải dùng social_search chứ không phải timeline của chính người đó."
+      }
+    },
+    {
+      "id": "GS03_news_timeframe_month",
+      "phase": "B",
+      "suite": "group",
+      "query": "Có tin tức gì về NVIDIA trong tháng này không?",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "month"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "arg_topic_timeframe",
+        "difficulty": "medium",
+        "what_it_tests": "Tin tức => topic=news, và 'tháng này' => timeframe=month (không dùng mặc định week)."
+      }
+    },
+    {
+      "id": "GS04_thanks_no_tool",
+      "phase": "B",
+      "suite": "group",
+      "query": "Cảm ơn bạn, mình hiểu rồi!",
+      "failure_type": "unnecessary_tool",
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "metadata": {
+        "skill": "no_unnecessary_tool",
+        "difficulty": "easy",
+        "what_it_tests": "Câu xã giao không cần dữ liệu: agent trả lời ngắn, KHÔNG gọi tool nào."
+      }
+    },
+    {
+      "id": "GS05_send_text_given_still_confirm",
+      "phase": "B",
+      "suite": "group",
+      "query": "Gửi dòng 'Họp nhóm lúc 3 giờ chiều mai' lên Telegram cho mình",
+      "failure_type": "wrong_boundary",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "confirm_before_write",
+        "difficulty": "medium",
+        "what_it_tests": "Dù nội dung gửi đã rõ, người dùng CHƯA xác nhận: phải hỏi yes_no trước, không gọi send ngay."
+      }
+    },
+    {
+      "id": "GM01_correct_target_carry_limit",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Cho mình xem bài đăng mới của Jensen Huang"
+        },
+        {
+          "role": "user",
+          "content": "Lấy 4 bài thôi"
+        },
+        {
+          "role": "user",
+          "content": "À mình muốn tài khoản NVIDIA chính thức, không phải của Jensen"
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "nvidia",
+              "limit": 4
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_correction_target",
+        "difficulty": "hard",
+        "what_it_tests": "3 lượt: bỏ target cũ (Jensen Huang), dùng handle nvidia ở lượt 3 và giữ limit=4 từ lượt 2."
+      }
+    },
+    {
+      "id": "GM02_clarify_then_fill_topic",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm tweet mới nhất giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "Chủ đề là robot hình người, lấy 10 cái"
+        }
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "limit": 10
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_fill_missing",
+        "difficulty": "medium",
+        "what_it_tests": "2 lượt: lượt 1 thiếu chủ đề, lượt 2 bổ sung; agent dùng social_search (tweet theo chủ đề) với limit=10."
+      }
+    },
+    {
+      "id": "GM03_switch_url_to_social_top",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Đọc giúp mình https://example.com/ai-report"
+        },
+        {
+          "role": "user",
+          "content": "Thôi khỏi đọc bài đó, mình muốn xem Twitter đang bàn gì về Gemini"
+        },
+        {
+          "role": "user",
+          "content": "Lấy các tweet phổ biến nhất nhé"
+        }
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "search_type": "Top"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_switch_tool",
+        "difficulty": "hard",
+        "what_it_tests": "3 lượt: bỏ yêu cầu fetch URL, chuyển sang social_search và chọn search_type=Top theo lượt 3."
+      }
+    },
+    {
+      "id": "GM04_explicit_confirm_then_send",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Đăng dòng 'Bản tin AI sáng nay đã sẵn sàng' lên Telegram"
+        },
+        {
+          "role": "user",
+          "content": "Mình xác nhận, gửi đúng nội dung như trên"
+        }
+      ],
+      "failure_type": "wrong_boundary",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "send",
+            "args": {
+              "confirmed": true
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "confirm_then_write",
+        "difficulty": "hard",
+        "what_it_tests": "Người dùng đã xác nhận rõ ràng ở lượt 2: agent gọi send với confirmed=true, không hỏi lại vô tận."
+      }
+    },
+    {
+      "id": "GM05_drop_task_out_of_scope",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm tin AI hôm nay giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "À thôi bỏ đi, giúp mình viết email xin nghỉ phép ngày mai"
+        }
+      ],
+      "failure_type": "out_of_scope",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "metadata": {
+        "skill": "multiturn_out_of_scope",
+        "difficulty": "hard",
+        "what_it_tests": "2 lượt: yêu cầu research bị huỷ, yêu cầu mới ngoài phạm vi (viết email); agent không gọi tool và từ chối/định hướng lại."
+      }
+    }
+  ]
 }
