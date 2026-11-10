@@ -126,10 +126,6 @@ Quy ước: FAIL→PASS = improvement, PASS→FAIL = regression (ghi lại dù m
 
 **Regression đáng chú ý:** M06 pass ở v0 và v1, nhưng fail từ v2 (`multiturn_accuracy` 1.00 → 0.8333). Giả thuyết (chưa kiểm chứng bằng run riêng): v2 thêm rule multi-tool ("Do not restrict yourself to a single tool", "Use all tools necessary") và "preserve context", làm agent giữ lại `social_search` của lượt trước. Đây khớp với root cause v4 nhắm tới. Các regression tiềm năng khác được tài liệu liệt kê (hỏi `clarify` quá nhiều, áp name→handle mơ hồ, từ chối nhầm request hợp lệ, hỏi xác nhận `send` lặp lại) **không** thấy xuất hiện trong 20 case base.
 
-### B2.5. Chưa kiểm chứng
-
-Các tình huống multi-turn trong tài liệu phân tích (Top/Latest carry-over "làm tương tự cho Anthropic", correction `week`→`day`, Web→Tweets) **chưa có case tương ứng** trong base eval; `eval_group.json` có G06–G10 phủ một phần (đổi limit, đổi nguồn, đổi chủ đề) nhưng chưa chạy được (xem B3). Các failure type trên chỉ là giả thuyết cho tới khi chạy được các case đó.
-
 ## B3. Team Eval Cases
 
 10 case trong `data/eval_group.json` (5 single-turn G01–G05, 5 multi-turn G06–G10).
